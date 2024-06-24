@@ -1,36 +1,223 @@
+import 'dart:io';
+
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 
-class HomeRoute extends StatelessWidget {
+class HomeRoute extends StatefulWidget {
   const HomeRoute({super.key});
+
+  @override
+  State<HomeRoute> createState() => _HomeRouteState();
+}
+
+class _HomeRouteState extends State<HomeRoute> {
+  Future<String> _getDeviceInfo() async {
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+
+    if (Platform.isAndroid) {
+      AndroidDeviceInfo android = await deviceInfo.androidInfo;
+      return "${android.model} (${android.id})";
+    }
+
+    if (Platform.isWindows) {
+      WindowsDeviceInfo windows = await deviceInfo.windowsInfo;
+      return "${windows.deviceId.replaceAll('{', '').replaceAll('}', '')} (${windows.releaseId})";
+    }
+
+    return "unknown (unknown)";
+  }
+
+  Future<String> _getVersion() async {
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+
+    if (Platform.isAndroid) {
+      AndroidDeviceInfo android = await deviceInfo.androidInfo;
+      return "${android.version} (ABI ${android.supportedAbis.first})";
+    }
+
+    if (Platform.isWindows) {
+      WindowsDeviceInfo windows = await deviceInfo.windowsInfo;
+      return "${windows.displayVersion} (${windows.editionId} Edition)";
+    }
+
+    return "unknown (unknown)";
+  }
+
+  Future<String> _getPatchVersion() async {
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+
+    if (Platform.isAndroid) {
+      AndroidDeviceInfo android = await deviceInfo.androidInfo;
+      return "${android.version.securityPatch}";
+    }
+
+    if (Platform.isWindows) {
+      WindowsDeviceInfo windows = await deviceInfo.windowsInfo;
+      return windows.displayVersion;
+    }
+
+    return "unknown patch";
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-            backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-            title: const Text("Prototype routes, design will come in later!")),
+        backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
         body: Center(
+            child: Padding(
+          padding: const EdgeInsets.all(16.0),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const Text("Routes to be tested and implemented."),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  ElevatedButton(
+              Text("ASUkA",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
+              Text("Android Security Universal Checker [Rev A]"),
+              SizedBox(height: 10),
+              Card.outlined(
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      ListTile(
+                        title: Text("Device",
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        subtitle: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Device Info
+                            Text("Model", style: TextStyle(fontSize: 14)),
+                            FutureBuilder(
+                                future: _getDeviceInfo(),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return CircularProgressIndicator();
+                                  }
+
+                                  if (snapshot.hasError) {
+                                    return Text("Failed to fetch info! [1]",
+                                        style: TextStyle(color: Colors.red));
+                                  }
+
+                                  if (snapshot.hasData) {
+                                    String deviceInfo = snapshot.data as String;
+                                    return Text(deviceInfo,
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold));
+                                  }
+
+                                  return Text("Failed to fetch info! [2]");
+                                }),
+
+                            // Version Info
+                            Text("System version",
+                                style: TextStyle(fontSize: 14)),
+                            FutureBuilder(
+                                future: _getVersion(),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return CircularProgressIndicator();
+                                  }
+
+                                  if (snapshot.hasError) {
+                                    return Text("Failed to fetch info! [1]",
+                                        style: TextStyle(color: Colors.red));
+                                  }
+
+                                  if (snapshot.hasData) {
+                                    String deviceInfo = snapshot.data as String;
+                                    return Text(deviceInfo,
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold));
+                                  }
+
+                                  return Text("Failed to fetch info! [2]");
+                                }),
+                            // Security Info
+                            Text("Current patch version",
+                                style: TextStyle(fontSize: 14)),
+                            FutureBuilder(
+                                future: _getPatchVersion(),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return CircularProgressIndicator();
+                                  }
+
+                                  if (snapshot.hasError) {
+                                    return Text("Failed to fetch info! [1]",
+                                        style: TextStyle(color: Colors.red));
+                                  }
+
+                                  if (snapshot.hasData) {
+                                    String deviceInfo = snapshot.data as String;
+                                    return Text(deviceInfo,
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold));
+                                  }
+
+                                  return Text("Failed to fetch info! [2]");
+                                })
+                          ],
+                        ),
+                      )
+                    ],
+                  )),
+              SizedBox(height: 3),
+              SizedBox(
+                  width: double.infinity,
+                  child: TextButton.icon(
+                      icon: Icon(Icons.replay_outlined, size: 16),
+                      label: Text("Run security checks"),
+                      onPressed: () {},
+                      style: ButtonStyle(
+                          shape:
+                              WidgetStateProperty.all<RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(32.0),
+                                      side: BorderSide(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .outline)))))),
+              SizedBox(height: 5),
+              SizedBox(
+                  width: double.infinity,
+                  child: TextButton.icon(
+                      icon: Icon(Icons.my_library_books_rounded, size: 16),
+                      label: Text("Learn more"),
+                      onPressed: () {},
+                      style: ButtonStyle(
+                          shape:
+                              WidgetStateProperty.all<RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(32.0),
+                                      side: BorderSide(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .outline)))))),
+              SizedBox(height: 5),
+              SizedBox(
+                  width: double.infinity,
+                  child: TextButton.icon(
+                      icon: Icon(Icons.my_library_books_rounded, size: 16),
+                      label: Text("About"),
                       onPressed: () {
-                        Navigator.pushNamed(context, "/safetynet");
+                        Navigator.pushNamed(context, "/about");
                       },
-                      child: const Text("SafetyNet")),
-                  ElevatedButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, "/applications");
-                      },
-                      child: const Text("Applications"))
-                ],
-              )
+                      style: ButtonStyle(
+                          shape:
+                              WidgetStateProperty.all<RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(32.0),
+                                      side: BorderSide(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .outline)))))),
             ],
           ),
-        ));
+        )));
   }
 }
