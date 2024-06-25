@@ -1,4 +1,7 @@
+import "dart:io";
+
 import 'package:flutter/material.dart';
+import "package:flutter/services.dart";
 import "package:misato/pages/about.dart";
 
 import "package:misato/pages/home_page.dart";
@@ -14,8 +17,14 @@ class MisatoApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (Platform.isAndroid) {
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
+          overlays: [SystemUiOverlay.bottom]);
+    }
+
     return MaterialApp(
         title: 'Misato',
+        debugShowCheckedModeBanner: false,
         theme: ThemeData(
           colorScheme:
               ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 76, 77, 158)),
