@@ -12,10 +12,10 @@ total snakeoil network security detection thingamajig
 something that resembles a security app, this is my first time doing this kind of stuff so excuse the awful codebase/theories.
 
 ## todo
-- [ ] track sus stuff.
-- [ ] use the NEWEST (and LATEST) malware detection, whatever that means.
-- [ ] warn da hood for threats
-- [ ] let users flag sus stuff
+- [/] show device info
+- [ ] safetynet/playintegrity api check
+- [ ] local app checks (look for unsigned build)
+- [ ] blacklisted apps (same as above but for certain apps)
 
 ## technologies used
 
