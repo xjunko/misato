@@ -40,7 +40,8 @@ class _AboutRouteState extends State<AboutRoute> {
                               "Why",
                               style: TextStyle(fontSize: 14),
                             ),
-                            Text("I ask that myself everyday."),
+                            Text("I ask that myself everyday.",
+                                style: TextStyle(fontWeight: FontWeight.bold)),
                           ],
                         ),
                       )
