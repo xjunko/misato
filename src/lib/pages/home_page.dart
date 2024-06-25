@@ -11,6 +11,8 @@ class HomeRoute extends StatefulWidget {
 }
 
 class _HomeRouteState extends State<HomeRoute> {
+  bool _hasChecked = false;
+
   Future<String> _getDeviceInfo() async {
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
 
@@ -74,105 +76,19 @@ class _HomeRouteState extends State<HomeRoute> {
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
               Text("Android Security Universal Checker [Rev A]"),
               SizedBox(height: 10),
-              Card.outlined(
-                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      ListTile(
-                        title: Text("Device",
-                            style: TextStyle(fontWeight: FontWeight.bold)),
-                        subtitle: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Device Info
-                            Text("Model", style: TextStyle(fontSize: 14)),
-                            FutureBuilder(
-                                future: _getDeviceInfo(),
-                                builder: (context, snapshot) {
-                                  if (snapshot.connectionState ==
-                                      ConnectionState.waiting) {
-                                    return CircularProgressIndicator();
-                                  }
-
-                                  if (snapshot.hasError) {
-                                    return Text("Failed to fetch info! [1]",
-                                        style: TextStyle(color: Colors.red));
-                                  }
-
-                                  if (snapshot.hasData) {
-                                    String deviceInfo = snapshot.data as String;
-                                    return Text(deviceInfo,
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold));
-                                  }
-
-                                  return Text("Failed to fetch info! [2]");
-                                }),
-
-                            // Version Info
-                            Text("System version",
-                                style: TextStyle(fontSize: 14)),
-                            FutureBuilder(
-                                future: _getVersion(),
-                                builder: (context, snapshot) {
-                                  if (snapshot.connectionState ==
-                                      ConnectionState.waiting) {
-                                    return CircularProgressIndicator();
-                                  }
-
-                                  if (snapshot.hasError) {
-                                    return Text("Failed to fetch info! [1]",
-                                        style: TextStyle(color: Colors.red));
-                                  }
-
-                                  if (snapshot.hasData) {
-                                    String deviceInfo = snapshot.data as String;
-                                    return Text(deviceInfo,
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold));
-                                  }
-
-                                  return Text("Failed to fetch info! [2]");
-                                }),
-                            // Security Info
-                            Text("Current patch version",
-                                style: TextStyle(fontSize: 14)),
-                            FutureBuilder(
-                                future: _getPatchVersion(),
-                                builder: (context, snapshot) {
-                                  if (snapshot.connectionState ==
-                                      ConnectionState.waiting) {
-                                    return CircularProgressIndicator();
-                                  }
-
-                                  if (snapshot.hasError) {
-                                    return Text("Failed to fetch info! [1]",
-                                        style: TextStyle(color: Colors.red));
-                                  }
-
-                                  if (snapshot.hasData) {
-                                    String deviceInfo = snapshot.data as String;
-                                    return Text(deviceInfo,
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold));
-                                  }
-
-                                  return Text("Failed to fetch info! [2]");
-                                })
-                          ],
-                        ),
-                      )
-                    ],
-                  )),
+              _createDeviceInfoCard(context),
+              if (_hasChecked) _createDeviceSecurityInfo(context),
               SizedBox(height: 3),
               SizedBox(
                   width: double.infinity,
                   child: TextButton.icon(
                       icon: Icon(Icons.replay_outlined, size: 16),
                       label: Text("Run security checks"),
-                      onPressed: () {},
+                      onPressed: () {
+                        setState(() {
+                          _hasChecked = true;
+                        });
+                      },
                       style: ButtonStyle(
                           shape:
                               WidgetStateProperty.all<RoundedRectangleBorder>(
@@ -219,5 +135,111 @@ class _HomeRouteState extends State<HomeRoute> {
             ],
           ),
         )));
+  }
+
+  Card _createDeviceInfoCard(BuildContext context) {
+    return Card.outlined(
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+        child: Column(
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            ListTile(
+              title:
+                  Text("Device", style: TextStyle(fontWeight: FontWeight.bold)),
+              subtitle: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Device Info
+                  Text("Model", style: TextStyle(fontSize: 14)),
+                  FutureBuilder(
+                      future: _getDeviceInfo(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return CircularProgressIndicator();
+                        }
+
+                        if (snapshot.hasError) {
+                          return Text("Failed to fetch info! [1]",
+                              style: TextStyle(color: Colors.red));
+                        }
+
+                        if (snapshot.hasData) {
+                          String deviceInfo = snapshot.data as String;
+                          return Text(deviceInfo,
+                              style: TextStyle(fontWeight: FontWeight.bold));
+                        }
+
+                        return Text("Failed to fetch info! [2]");
+                      }),
+
+                  // Version Info
+                  Text("System version", style: TextStyle(fontSize: 14)),
+                  FutureBuilder(
+                      future: _getVersion(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return CircularProgressIndicator();
+                        }
+
+                        if (snapshot.hasError) {
+                          return Text("Failed to fetch info! [1]",
+                              style: TextStyle(color: Colors.red));
+                        }
+
+                        if (snapshot.hasData) {
+                          String deviceInfo = snapshot.data as String;
+                          return Text(deviceInfo,
+                              style: TextStyle(fontWeight: FontWeight.bold));
+                        }
+
+                        return Text("Failed to fetch info! [2]");
+                      }),
+                  // Security Info
+                  Text("Current patch version", style: TextStyle(fontSize: 14)),
+                  FutureBuilder(
+                      future: _getPatchVersion(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return CircularProgressIndicator();
+                        }
+
+                        if (snapshot.hasError) {
+                          return Text("Failed to fetch info! [1]",
+                              style: TextStyle(color: Colors.red));
+                        }
+
+                        if (snapshot.hasData) {
+                          String deviceInfo = snapshot.data as String;
+                          return Text(deviceInfo,
+                              style: TextStyle(fontWeight: FontWeight.bold));
+                        }
+
+                        return Text("Failed to fetch info! [2]");
+                      })
+                ],
+              ),
+            )
+          ],
+        ));
+  }
+
+  Card _createDeviceSecurityInfo(BuildContext context) {
+    return Card.outlined(
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+        child: Column(
+          mainAxisSize: MainAxisSize.max,
+          children: const [
+            ListTile(
+                leading: CircularProgressIndicator(
+                  strokeWidth: 2,
+                ),
+                title: Text("Please wait...",
+                    style: TextStyle(fontWeight: FontWeight.bold)))
+          ],
+        ));
   }
 }
